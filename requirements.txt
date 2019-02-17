@@ -1,0 +1,7 @@
+spacy
+networkx
+numpy
+scipy
+sklearn
+gensim
+pyemd
