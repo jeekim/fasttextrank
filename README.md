@@ -111,7 +111,7 @@ PYTHONPATH=. pytest -p no:warnings tests/test_textrerank.py
 
 ```
 
-* How to extract keywords from a file?
+* How to extract keywords from a file? You can download the model from [here](https://drive.google.com/open?id=1AOabroznzLrtoXzb7ZW5RqjEvedu71-q).
 ```bash
 PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.bin -n 3 -w 3 -d 0.2
 ```

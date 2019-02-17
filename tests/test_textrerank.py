@@ -58,13 +58,14 @@ def test_fasttextrank2():
     extractor.remove_duplicate_candidates(threshold=0.1)
 
     key_phrases = [k for k in extractor.get_nbest(n=5)]
+    print(key_phrases)
 
     assert key_phrases == [
         'typical remote sensing application',
-        'remote sensing applications',
         'digital image distribution',
         'unsupervised image classification',
-        'possible applications capable'
+        'possible applications capable',
+        'remote sensing imagery',
     ]
 
 

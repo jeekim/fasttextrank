@@ -36,7 +36,7 @@ class FastTextRank(BaseRank):
         """
         super().__init__()
         self.graph = nx.Graph()
-        self.model = FastText.load_fasttext_format(model)
+        self.model = FastText.load(model)
 
     def process_text(self, text):
         """
