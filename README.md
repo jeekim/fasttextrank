@@ -104,6 +104,11 @@ The following figure is a visualisation of 200 word vectors from Hulth dataset. 
 ![Hulth fastText model](image/fastText_word2vec.png "Words from Hulth 500 abstracts")
 
 ### Usages
+* How to train word2vec using fastText?
+
+```bash
+PYTHONPATH=. python bin/train_fasttext.py
+```
 
 * How to run a test?
 ```bash
@@ -111,24 +116,16 @@ PYTHONPATH=. pytest -p no:warnings tests/test_textrerank.py
 
 ```
 
-* How to extract keywords from a file? You can download the model from [here](https://drive.google.com/open?id=1AOabroznzLrtoXzb7ZW5RqjEvedu71-q).
+* How to extract keywords from a file?
 ```bash
 PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.bin -n 3 -w 3 -d 0.2
 ```
 
-* How to train word2vec using fastText?
-
-```bash
-fasttext skipgram -input data/hulth -output model/hulth
-```
-
 ## Contributions
-
 * Built a word embedding model on Hulth dataset using fastText.
 * Integrate distributional semantics to graph-based method for keyword extraction as a proof-of-concept.
 
 ## Future work
-
 * To calculate precision and recall of the system on various test sets.
 * To use word embeddings and document distance model based on them to re-rank key phrases instead of filtering.
 
