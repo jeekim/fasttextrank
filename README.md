@@ -54,8 +54,8 @@ adjectives. The system selects the longest sequences of nouns and adjectives wit
 Word Mover’s Distance (WMD) [5] implemented in gensim and removed the low-ranked phrase if the distance is less than
 a threshold.
 
-### Training fastText on Hulth dataset [1]
-Hulth dataset consists of 500 abstracts. After simple pre-processing (e.g., lower cases, remove punctuations, etc),
+### Training fastText on Hulth dataset
+Hulth dataset [1] consists of 500 abstracts. After simple pre-processing (e.g., lower cases, remove punctuations, etc),
 we build a word embedding model using fastText [4].
 
 ## Results
@@ -98,6 +98,8 @@ copyright protection; digital watermarking; near-lossless watermarking; digital 
 unsupervised image classification
 ```
 ### T-SNE visualisation
+The following figure is a visualisation of 200 word vectors from Hulth dataset. Stopwords are removed before choosing
+200 words.
 
 ![Hulth fastText model](image/fastText_word2vec.png "Words from Hulth 500 abstracts")
 

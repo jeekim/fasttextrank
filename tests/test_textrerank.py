@@ -45,7 +45,7 @@ def test_fasttextrrank1():
         'cognitive profiles themselves',
         'realist idea',
         'realist conception',
-        'selective representing']
+        'biological niches']
 
 
 def test_fasttextrank2():

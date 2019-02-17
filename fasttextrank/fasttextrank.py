@@ -109,7 +109,7 @@ class FastTextRank(BaseRank):
         :return:
         """
         # calculate PageRank score for each node using default values
-        w = nx.pagerank_scipy(self.graph, alpha=0.85, tol=1e-06, weight=None)
+        w = nx.pagerank_numpy(self.graph, alpha=0.85, weight=None)
         keywords = sorted(w, key=w.get, reverse=True)
 
         self.select_longest_keyword_sequences(keywords)
