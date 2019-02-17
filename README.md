@@ -104,6 +104,12 @@ The following figure is a visualisation of 200 word vectors from Hulth dataset. 
 ![Hulth fastText model](image/fastText_word2vec.png "Words from Hulth 500 abstracts")
 
 ### Usages
+* How to install dependencies?
+```bash
+pip install -r requirements.txt
+python -m spacy download en
+```
+
 * How to train word2vec using fastText?
 
 ```bash
@@ -118,7 +124,7 @@ PYTHONPATH=. pytest -p no:warnings tests/test_textrerank.py
 
 * How to extract keywords from a file?
 ```bash
-PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.bin -n 3 -w 3 -d 0.2
+PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.model -n 5 -w 3 -d 0.1
 ```
 
 ## Contributions
