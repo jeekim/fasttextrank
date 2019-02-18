@@ -102,7 +102,7 @@ copyright protection; digital watermarking; near-lossless watermarking; digital 
 unsupervised image classification
 ```
 #### Effects of removing duplicates based on distance
-Having analysed few examples of duplicate deletion, we found that less specific key phrases removed when there are more
+Having analysed few examples of duplicate deletion, we found that less specific key phrases were removed when there are more
 specific phrases.
 ```bash
 'protection' due to 'copyright protection'
