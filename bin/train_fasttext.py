@@ -5,16 +5,19 @@ import argparse
 
 def main():
     """
+    script to training fastText word embedding model
     """
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-i', '--input-file', required=False, default=config.DATA_FILE,
-                        help='')
+                        help='input data file for training')
     parser.add_argument('-m', '--model-file', required=False, default=config.MODEL_FILE,
-                        help='')
+                        help='model output name')
+    parser.add_argument('-s', '--embedding-size', required=False, type=int, default=config.MODEL_FILE,
+                        help='model output name')
 
     args = parser.parse_args()
 
-    model = FastText(size=300, sg=1)
+    model = FastText(size=args.embedding_size, sg=1)
     model.build_vocab(corpus_file=args.input_file)
 
     total_words = model.corpus_total_words

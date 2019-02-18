@@ -128,6 +128,7 @@ class FastTextRank(BaseRank):
         """
         top_keys = sorted(self.weights, key=self.weights.get, reverse=True)
         keys_to_delete = []
+        reasons_to_delete =[]
 
         for (k1, k2) in combinations(top_keys, 2):
             if k1 == k2:
@@ -138,9 +139,15 @@ class FastTextRank(BaseRank):
             # remove a lower ranked candidate
             if distance < threshold:
                 keys_to_delete.append(k2)
+                reasons_to_delete.append((k2, k1))
 
         # delete candidates selected from above
         for k in set(keys_to_delete):
-            logging.warning(f'removing {k} from candidates.')
+            # logging.warning(f'removing {k} from candidates')
             del self.candidates[k]
             del self.weights[k]
+
+        # explain why key phrases deleted
+        for (k2, k1) in set(reasons_to_delete):
+            logging.warning(f'removing {k2} due to {k1}')
+

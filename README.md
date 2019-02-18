@@ -1,4 +1,4 @@
-# fastTextRank: using fastText word embedding model to remove duplicate key phrases with morphological variations
+# fastTextRank: using fastText subword embedding model to remove duplicate key phrases with morphological variations
 
 ## Motivation
 Keyword/phrase extraction is an important task for information retrieval, text categorization, text summarization and other
@@ -55,12 +55,12 @@ Word Mover’s Distance (WMD) [5] implemented in gensim and removed the low-rank
 a threshold.
 
 ### Training fastText on Hulth dataset
-Hulth dataset [1] consists of 500 abstracts. After simple pre-processing (e.g., lower cases, remove punctuations, etc),
+Hulth dataset [1] consists of 500 abstracts with 248,355 words. After simple pre-processing (e.g., lower cases, remove punctuations, etc),
 we build a word embedding model using fastText [4].
 
 ## Results
 
-### Examples
+### Example
 
 - Input text
 ```bash
@@ -97,9 +97,19 @@ Uncontrolled: remote sensing images; electronic delivery; watermarking technique
 copyright protection; digital watermarking; near-lossless watermarking; digital image distribution;
 unsupervised image classification
 ```
+#### Effects of removing duplicates based on distance
+Having analysed few examples of duplicate deletion, we found that less specific key phrases removed when there are more
+specific phrases.
+```bash
+'protection' due to 'copyright protection'
+'watermarking techniques' due to 'digital watermarking techniques'
+'remote sensing applications' due to 'typical remote sensing application'
+```
+
 ### T-SNE visualisation
 The following figure is a visualisation of 200 word vectors from Hulth dataset. Stopwords are removed before choosing
-200 words.
+200 words. In the figure, you can see that some morphological variations (e.g., computer and computing) and similar
+words (e.g, presented and proposed) are grouped together.
 
 ![Hulth fastText model](image/fastText_word2vec.png "Words from Hulth 500 abstracts")
 
@@ -113,7 +123,7 @@ python -m spacy download en
 * How to train word2vec using fastText?
 
 ```bash
-PYTHONPATH=. python bin/train_fasttext.py
+PYTHONPATH=. python bin/train_fasttext.py -s 300
 ```
 
 * How to run a test?
@@ -122,10 +132,14 @@ PYTHONPATH=. pytest -p no:warnings tests/test_textrerank.py
 
 ```
 
-* How to extract keywords from a file?
+* How to extract keywords from a file? When running the script, you can play with the following parameters.
+    - n: number of key phrases in a ranked order
+    - w: window size for valid distance between words for adding edges
+    - d: distance threshold for removing similar key phrases
 ```bash
 PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.model -n 5 -w 3 -d 0.1
 ```
+
 
 ## Contributions
 * Built a word embedding model on Hulth dataset using fastText.
