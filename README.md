@@ -12,10 +12,14 @@ of integrating fastText, a word embedding model and implemented a keyword extrac
 concept.
 
 ### What are keywords (and keyphrases)?
-In general, keywords should have two features.
+Depending on applications, the definition of keywords can be different. In this project, we extract key phrases
+from information retrieval perspective. Here, keywords should have the following two features.
 
-* Representativeness: e.g., TF, local
-* Discriminativeness: e.g., IDF, global
+* Representativeness: key phrases should represent the document. Term frequency is often used for this.
+* Discriminativeness: key phrases should make a document distinct from other documents.
+Inverse document frequency is often used for this.
+
+The former is local information and the latter global.
    
 ## Approaches
 There has been mainly two approaches: supervised and unsupervised. Unsupervised methods consist of statistical and
