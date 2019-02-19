@@ -11,7 +11,7 @@ However, this method has not been fully explored for keyword extraction. In this
 of integrating fastText, a word embedding model and implemented a keyword extraction system to test this proof of
 concept.
 
-### What are keywords (and keyphrases)?
+### What are keywords (and keyphrases) and how to extract them?
 Depending on applications, the definition of keywords can be different. In this project, we extract key phrases
 from information retrieval perspective. Here, keywords should have the following two features.
 
@@ -19,7 +19,7 @@ from information retrieval perspective. Here, keywords should have the following
 * Discriminativeness: key phrases should make a document distinct from other documents.
 Inverse document frequency is often used for this.
 
-The former is local information and the latter global.
+The former is local information and the latter global. In this project, we assume that keywords/phrases are made of combinations of adjectives and nouns. We ranks the longest sequences of these combinations based on those two perspecitves mentioined above.
    
 ## Approaches
 There has been mainly two approaches: supervised and unsupervised. Unsupervised methods consist of statistical and
