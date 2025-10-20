@@ -69,7 +69,54 @@ def test_fasttextrank2():
     ]
 
 
+def test_explanation_feature():
+    """
+    Test the explanation feature
+    """
+    extractor = FastTextRank(model=config.MODEL_FILE)
+    extractor.process_text(text=text2)
+    extractor.build_word_graph(window=2, pos=config.VALID_POSTAGS)
+    extractor.rank_candidates(normalized=False)
+    extractor.remove_duplicate_candidates(threshold=0.1)
+
+    # Get explanation
+    explanation = extractor.get_explanation(n=5)
+
+    # Check that explanation has required keys
+    assert 'graph_stats' in explanation
+    assert 'top_keyphrases' in explanation
+    assert 'removed_keyphrases' in explanation
+
+    # Check graph stats
+    assert explanation['graph_stats'] is not None
+    assert 'num_nodes' in explanation['graph_stats']
+    assert 'num_edges' in explanation['graph_stats']
+    assert 'num_sentences' in explanation['graph_stats']
+    assert 'top_words' in explanation['graph_stats']
+
+    # Check top keyphrases
+    assert len(explanation['top_keyphrases']) == 5
+    for kp in explanation['top_keyphrases']:
+        assert 'keyphrase' in kp
+        assert 'total_score' in kp
+        assert 'word_breakdown' in kp
+        assert 'num_occurrences' in kp
+
+    # Check removed keyphrases
+    assert len(explanation['removed_keyphrases']) > 0
+    for removed in explanation['removed_keyphrases']:
+        assert 'removed' in removed
+        assert 'reason' in removed
+        assert 'distance' in removed
+        assert 'kept_phrase' in removed
+
+    print("Explanation feature test passed!")
+    print(f"Graph has {explanation['graph_stats']['num_nodes']} nodes and {explanation['graph_stats']['num_edges']} edges")
+    print(f"Removed {len(explanation['removed_keyphrases'])} duplicate keyphrases")
+
+
 if __name__ == '__main__':
     test_fasttextrrank1()
     test_fasttextrank2()
+    test_explanation_feature()
 
