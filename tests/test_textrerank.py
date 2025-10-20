@@ -1,6 +1,5 @@
-import unittest
-from unittest.mock import patch, MagicMock
 import fasttextrank.config as config
+
 from fasttextrank.fasttextrank import FastTextRank
 
 text1 = "We discuss the thesis of selective representing-the idea that the contents of the mental representations" \
@@ -30,112 +29,47 @@ text2 = "Earth observation missions have recently attracted a growing interest, 
         " classification."
 
 
-class TestFastTextRankEndToEnd(unittest.TestCase):
+def test_fasttextrrank1():
+    """
+    """
+    extractor = FastTextRank(model=config.MODEL_FILE)
+    extractor.process_text(text=text1)
+    extractor.build_word_graph(window=2, pos=config.VALID_POSTAGS)
+    extractor.rank_candidates(normalized=False)
+    extractor.remove_duplicate_candidates(threshold=0.1)
 
-    @patch('fasttextrank.fasttextrank.FastText.load')
-    def test_fasttextrrank1(self, mock_fasttext_load):
-        # Setup mock for FastText model
-        mock_model_instance = MagicMock()
-        mock_wv = MagicMock()
-        
-        # Simple wmdistance mock
-        def mock_wmdistance_func(doc1_lexical, doc2_lexical):
-            # doc1_lexical and doc2_lexical are lists of tokens (lemmas)
-            # This mock will consider them different if their string representations are different.
-            # A real model would compare semantics.
-            s_doc1 = " ".join(doc1_lexical)
-            s_doc2 = " ".join(doc2_lexical)
-            if s_doc1 == s_doc2:
-                return 0.0 
-            # Return a value that is either above or below the filter_threshold (0.1)
-            # to simulate some filtering. Let's make most non-identical pairs "similar enough"
-            # to be filtered if one is lower ranked.
-            # This is arbitrary and aims to make the test exercise the filter logic.
-            # If s_doc1 and s_doc2 share any token, consider them "close".
-            if any(token in s_doc2.split() for token in s_doc1.split()):
-                 return 0.05 # "Similar"
-            return 0.5 # "Different"
+    key_phrases = [k for k in extractor.get_nbest(n=5)]
 
-        mock_wv.wmdistance = MagicMock(side_effect=mock_wmdistance_func)
-        mock_model_instance.wv = mock_wv
-        mock_fasttext_load.return_value = mock_model_instance
-
-        # Use model_path consistent with how FastTextRank expects it
-        extractor = FastTextRank(model_path="dummy/path/model.bin")
-        extractor.process_text(text=text1)
-        
-        extractor.rank_candidates(
-            normalized=False, 
-            window=2, 
-            pos=config.VALID_POSTAGS, 
-            filter_threshold=0.1 # Threshold used in original test
-        )
-
-        key_phrases = [k for k in extractor.get_nbest(n=5)]
-        print("Test 1 Key Phrases:", key_phrases)
-
-        # The expected key_phrases will likely change due to the mocked wmdistance.
-        # For now, I'll keep the original and expect it to fail, then adjust.
-        expected_key_phrases_text1 = [
-            'our primary concern', # This might remain if it's highly ranked and unique
-            'cognitive profiles themselves', 
-            'realist idea', 
-            'realist conception', 
-            'biological niches'
-        ]
-        # self.assertEqual(key_phrases, expected_key_phrases_text1)
-        # Since the mock is different, we can't expect the same output.
-        # For now, let's assert that we get 5 keyphrases.
-        self.assertEqual(len(key_phrases), 5)
-        # And that they are strings
-        for phrase in key_phrases:
-            self.assertIsInstance(phrase, str)
+    assert key_phrases == [
+        'our primary concern',
+        'cognitive profiles themselves',
+        'realist idea',
+        'realist conception',
+        'biological niches']
 
 
-    @patch('fasttextrank.fasttextrank.FastText.load')
-    def test_fasttextrank2(self, mock_fasttext_load):
-        # Setup mock for FastText model
-        mock_model_instance = MagicMock()
-        mock_wv = MagicMock()
+def test_fasttextrank2():
+    """
+    """
+    extractor = FastTextRank(model=config.MODEL_FILE)
+    extractor.process_text(text=text2)
+    extractor.build_word_graph(window=2, pos=config.VALID_POSTAGS)
+    extractor.rank_candidates(normalized=False)
+    extractor.remove_duplicate_candidates(threshold=0.1)
 
-        def mock_wmdistance_func(doc1_lexical, doc2_lexical):
-            s_doc1 = " ".join(doc1_lexical)
-            s_doc2 = " ".join(doc2_lexical)
-            if s_doc1 == s_doc2:
-                return 0.0
-            if any(token in s_doc2.split() for token in s_doc1.split()):
-                 return 0.05 # "Similar"
-            return 0.5 # "Different"
+    key_phrases = [k for k in extractor.get_nbest(n=5)]
+    print(key_phrases)
 
-        mock_wv.wmdistance = MagicMock(side_effect=mock_wmdistance_func)
-        mock_model_instance.wv = mock_wv
-        mock_fasttext_load.return_value = mock_model_instance
-
-        extractor = FastTextRank(model_path="dummy/path/model.bin")
-        extractor.process_text(text=text2)
-        extractor.rank_candidates(
-            normalized=False, 
-            window=2, 
-            pos=config.VALID_POSTAGS,
-            filter_threshold=0.1 
-        )
-
-        key_phrases = [k for k in extractor.get_nbest(n=5)]
-        print("Test 2 Key Phrases:", key_phrases)
-
-        expected_key_phrases_text2 = [
-            'typical remote sensing application',
-            'digital image distribution',
-            'unsupervised image classification',
-            'possible applications capable',
-            'remote sensing imagery',
-        ]
-        # self.assertEqual(key_phrases, expected_key_phrases_text2)
-        # Similar to test1, asserting exact match is hard with the mock.
-        self.assertEqual(len(key_phrases), 5)
-        for phrase in key_phrases:
-            self.assertIsInstance(phrase, str)
+    assert key_phrases == [
+        'typical remote sensing application',
+        'digital image distribution',
+        'unsupervised image classification',
+        'possible applications capable',
+        'remote sensing imagery',
+    ]
 
 
 if __name__ == '__main__':
-    unittest.main()
+    test_fasttextrrank1()
+    test_fasttextrank2()
+
