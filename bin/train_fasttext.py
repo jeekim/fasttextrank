@@ -12,8 +12,8 @@ def main():
                         help='input data file for training')
     parser.add_argument('-m', '--model-file', required=False, default=config.MODEL_FILE,
                         help='model output name')
-    parser.add_argument('-s', '--embedding-size', required=False, type=int, default=config.MODEL_FILE,
-                        help='model output name')
+    parser.add_argument('-s', '--embedding-size', required=False, type=int, default=config.EMBEDDING_SIZE,
+                        help='A size of word embedding vector')
 
     args = parser.parse_args()
 
