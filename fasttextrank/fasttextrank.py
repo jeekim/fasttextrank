@@ -37,6 +37,8 @@ class FastTextRank(BaseRank):
         super().__init__()
         self.graph = nx.Graph()
         self.model = FastText.load(model)
+        self.word_scores = {}
+        self.removed_candidates = []
 
     def process_text(self, text):
         """
@@ -112,6 +114,9 @@ class FastTextRank(BaseRank):
         w = nx.pagerank_numpy(self.graph, alpha=0.85, weight=None)
         keywords = sorted(w, key=w.get, reverse=True)
 
+        # store word scores for explanation
+        self.word_scores = w
+
         self.select_longest_keyword_sequences(keywords)
 
         for k in self.candidates.keys():
@@ -139,7 +144,7 @@ class FastTextRank(BaseRank):
             # remove a lower ranked candidate
             if distance < threshold:
                 keys_to_delete.append(k2)
-                reasons_to_delete.append((k2, k1))
+                reasons_to_delete.append((k2, k1, distance))
 
         # delete candidates selected from above
         for k in set(keys_to_delete):
@@ -147,7 +152,88 @@ class FastTextRank(BaseRank):
             del self.candidates[k]
             del self.weights[k]
 
+        # store removed candidates for explanation
+        self.removed_candidates = list(set(reasons_to_delete))
+
         # explain why key phrases deleted
-        for (k2, k1) in set(reasons_to_delete):
+        for (k2, k1, distance) in self.removed_candidates:
             logging.warning(f'removing {k2} due to {k1}')
+
+    def get_graph_statistics(self):
+        """
+        Get statistics about the word graph
+        :return: dictionary with graph statistics
+        """
+        if not self.graph.nodes():
+            return None
+
+        stats = {
+            'num_nodes': self.graph.number_of_nodes(),
+            'num_edges': self.graph.number_of_edges(),
+            'num_sentences': len(self.sentences),
+            'top_words': []
+        }
+
+        if self.word_scores:
+            top_words = sorted(self.word_scores.items(), key=lambda x: x[1], reverse=True)[:10]
+            stats['top_words'] = [(word, round(score, 6)) for word, score in top_words]
+
+        return stats
+
+    def explain_keyphrase(self, keyphrase):
+        """
+        Explain why a keyphrase was scored the way it was
+        :param keyphrase: the keyphrase to explain
+        :return: dictionary with explanation details
+        """
+        if keyphrase not in self.weights:
+            return None
+
+        candidate = self.candidates[keyphrase]
+        tokens = candidate.lexical_form
+
+        explanation = {
+            'keyphrase': keyphrase,
+            'total_score': round(self.weights[keyphrase], 6),
+            'word_breakdown': [],
+            'surface_forms': candidate.surface_forms,
+            'num_occurrences': len(candidate.sentence_ids)
+        }
+
+        for token in tokens:
+            if token in self.word_scores:
+                explanation['word_breakdown'].append({
+                    'word': token,
+                    'pagerank_score': round(self.word_scores[token], 6)
+                })
+
+        return explanation
+
+    def get_explanation(self, n=5):
+        """
+        Get a comprehensive explanation of the extraction results
+        :param n: number of top keyphrases to explain
+        :return: dictionary with comprehensive explanation
+        """
+        explanation = {
+            'graph_stats': self.get_graph_statistics(),
+            'top_keyphrases': [],
+            'removed_keyphrases': []
+        }
+
+        # explain top N keyphrases
+        best = sorted(self.weights, key=self.weights.get, reverse=True)
+        for keyphrase in best[:min(n, len(best))]:
+            explanation['top_keyphrases'].append(self.explain_keyphrase(keyphrase))
+
+        # explain removed keyphrases
+        for (removed, kept, distance) in self.removed_candidates:
+            explanation['removed_keyphrases'].append({
+                'removed': removed,
+                'reason': f'too similar to "{kept}"',
+                'distance': round(distance, 4),
+                'kept_phrase': kept
+            })
+
+        return explanation
 

@@ -144,10 +144,81 @@ PYTHONPATH=. pytest -p no:warnings tests/test_textrerank.py
 PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.model -n 5 -w 3 -d 0.1
 ```
 
+* How to get explanations for keyword extraction? Use the `-e` or `--explain` flag to get detailed explanations:
+```bash
+PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.model -n 5 -w 3 -d 0.1 --explain
+```
+
+* How to get explanations in JSON format? Use the `--explain-json` flag:
+```bash
+PYTHONPATH=. python bin/run_textrerank.py -i data/sample2.txt -m model/hulth.model -n 5 -w 3 -d 0.1 --explain-json
+```
+
+
+## Explanation Feature
+
+The explanation feature provides detailed insights into how keywords are extracted and ranked:
+
+### What the explanation includes:
+
+1. **Graph Statistics**: Information about the word graph structure
+   - Number of nodes (unique words)
+   - Number of edges (word connections)
+   - Number of sentences processed
+   - Top 10 words by PageRank score
+
+2. **Keyphrase Breakdown**: For each extracted keyphrase, you get:
+   - Total score (sum of individual word PageRank scores)
+   - Individual word scores that contribute to the total
+   - Number of occurrences in the text
+   - Surface forms (how the phrase appears in different parts of text)
+
+3. **Duplicate Removal Details**: For keyphrases that were filtered out:
+   - Which phrases were removed
+   - Why they were removed (similar to which other phrase)
+   - Word Mover's Distance (WMD) between the similar phrases
+
+### Example output:
+
+```
+================================================================================
+EXTRACTION EXPLANATION
+================================================================================
+
+[Graph Statistics]
+  - Number of nodes (words): 87
+  - Number of edges (connections): 234
+  - Number of sentences: 5
+
+  Top 10 words by PageRank score:
+    sensing: 0.015234
+    remote: 0.014567
+    watermarking: 0.013234
+    ...
+
+[Top Keyphrases]
+
+1. 'typical remote sensing application' (score: 0.048234)
+   Occurrences in text: 1
+   Word composition:
+     - typical: 0.011234
+     - remote: 0.014567
+     - sensing: 0.015234
+     - application: 0.007199
+
+2. 'digital image distribution' (score: 0.045123)
+   ...
+
+[Removed Keyphrases (duplicates/similar phrases)]
+  - 'remote sensing applications' removed (distance: 0.0234)
+    Reason: too similar to "typical remote sensing application"
+  ...
+```
 
 ## Contributions
 * Built a word embedding model on Hulth dataset using fastText.
 * Integrate distributional semantics to graph-based method for keyword extraction as a proof-of-concept.
+* Added explanation feature to provide transparency into the keyword extraction process.
 
 ## Future work
 * To calculate precision and recall of the system on various test sets.
